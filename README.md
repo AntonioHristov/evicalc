@@ -1,2 +1,2 @@
 # evicalc
-asp .net api. Cliente, Servidor y Libreria
+asp .net web core api. Cliente, Servidor y Libreria

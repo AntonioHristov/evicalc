@@ -1,5 +1,6 @@
 ﻿using evicalc.models;
 using Microsoft.AspNetCore.Mvc;
+using System.Drawing;
 
 namespace evicalc.server.Controllers
 {
@@ -17,7 +18,10 @@ namespace evicalc.server.Controllers
         [HttpPost]
         public IActionResult Add(AddRequest request)
         {
-            if (request.Addens == null)
+            //return BadRequest("Hello");
+
+            //if (request.Addens == null)
+            if (request.Addens.Count() == 0)
             {
                 return BadRequest("Addens cannot be null");
             }
@@ -25,6 +29,12 @@ namespace evicalc.server.Controllers
             {
                 return BadRequest("Addens param requires at least two numbers to do something");
             }
+            /*
+            else if(request.Addens.GetType() == typeof(string))
+            {
+                return BadRequest("Addens must be a number, not a text");
+            }
+            */
 
             return Ok(new AddResponse() { Sum = request.Addens.Sum() });
 
@@ -42,10 +52,48 @@ namespace evicalc.server.Controllers
             */
         }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         [HttpPost]
-        public SubResponse Sub(SubRequest request)
+        //public SubResponse Sub(SubRequest request)
+        public IActionResult Sub(SubRequest request)
         {
-            return new SubResponse() { Difference = request.Minuend - request.Subtrahend };
+            if (request.Minuend == null)
+            {
+                return BadRequest("Minuend cannot be null");
+            }
+
+
+            return Ok(new SubResponse() { Difference = request.Minuend - request.Subtrahend });
+            //return new SubResponse() { Difference = request.Minuend - request.Subtrahend };
         }
 
     }
