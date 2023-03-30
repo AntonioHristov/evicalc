@@ -1,0 +1,10 @@
+C:\dev\evicalc\evicalc.models\bin\Debug\netstandard2.1\evicalc.models.deps.json
+C:\dev\evicalc\evicalc.models\bin\Debug\netstandard2.1\evicalc.models.dll
+C:\dev\evicalc\evicalc.models\bin\Debug\netstandard2.1\evicalc.models.pdb
+C:\dev\evicalc\evicalc.models\obj\Debug\netstandard2.1\evicalc.models.csproj.AssemblyReference.cache
+C:\dev\evicalc\evicalc.models\obj\Debug\netstandard2.1\evicalc.models.GeneratedMSBuildEditorConfig.editorconfig
+C:\dev\evicalc\evicalc.models\obj\Debug\netstandard2.1\evicalc.models.AssemblyInfoInputs.cache
+C:\dev\evicalc\evicalc.models\obj\Debug\netstandard2.1\evicalc.models.AssemblyInfo.cs
+C:\dev\evicalc\evicalc.models\obj\Debug\netstandard2.1\evicalc.models.csproj.CoreCompileInputs.cache
+C:\dev\evicalc\evicalc.models\obj\Debug\netstandard2.1\evicalc.models.dll
+C:\dev\evicalc\evicalc.models\obj\Debug\netstandard2.1\evicalc.models.pdb

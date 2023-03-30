@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "OFtLzO+sUyYKPdQKTGC3irFlKII0/iTLJ7hGlboupj8=",
+  "Source": "evicalc.server",
+  "BasePath": "_content/evicalc.server",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
