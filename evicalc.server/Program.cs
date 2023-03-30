@@ -23,10 +23,7 @@ namespace evicalc.server
             }
 
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }

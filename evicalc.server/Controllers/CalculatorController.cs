@@ -15,45 +15,18 @@ namespace evicalc.server.Controllers
         }
 
         [HttpPost]
-        public AddResponse Add(AddRequest request)
+        public IActionResult Add(AddRequest request)
         {
-            // ...
-            //return new AddResponse() { Sum = 99 };
-            // how to bind exceptions in webapi net core
             if (request.Addens == null)
             {
-                //throw new ArgumentNullException("Addens cannot be null");
-                return new AddResponse() { Sum = 472 };
+                return BadRequest("Addens cannot be null");
             }
             else if (request.Addens.Count() < 2)
             {
-                //throw new HttpResponseException("Addens requires at least two numbers to do something");
-
-                //throw new HttpResponseException(HttpStatusCode.NotFound);
-                //throw new Exception("Sample exception.");
-                //return NotFound("Product not found");
-
-                /*
-                var response = new HttpResponseMessage(HttpStatusCode.NotFound)
-                {
-                    Content = new StringContent("Addens requires at least two numbers to do something", System.Text.Encoding.UTF8, "text/plain"),
-                    StatusCode = HttpStatusCode.NotFound
-                };
-                throw new HttpResponseException(response);
-                */
-
-                throw new Exception("Sample exception.");
-
-
-
-                //return new AddResponse() { Sum = 666 };
+                return BadRequest("Addens param requires at least two numbers to do something");
             }
 
-                return new AddResponse() { Sum = request.Addens.Sum() };
-
-
-
-
+            return Ok(new AddResponse() { Sum = request.Addens.Sum() });
 
 
 
