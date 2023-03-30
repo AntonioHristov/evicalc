@@ -117,5 +117,13 @@ namespace evicalc.server.Controllers
         {
             return Ok(new SqrtResponse() { Square = Math.Sqrt(request.Number) });
         }
+
+        [HttpPost]
+        public IActionResult Query(QueryRequest request)
+        {
+            //request.Id
+            //return Ok(new QueryResponse() { Operations =  });
+            return Ok();
+        }
     }
 }
