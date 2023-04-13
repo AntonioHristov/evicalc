@@ -1,7 +1,7 @@
 ﻿namespace evicalc.models
 {
-    public class AddResponse
-    {
-        public double Sum {  get; set; }
-    }
+	public class AddResponse
+	{
+		public double Sum {  get; set; }
+	}
 }

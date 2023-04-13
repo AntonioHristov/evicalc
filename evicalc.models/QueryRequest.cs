@@ -1,7 +1,7 @@
 ﻿namespace evicalc.models
 {
-    public class QueryRequest
-    {
-        public string Id { get; set; }
-    }
+	public class QueryRequest
+	{
+		public int Id { get; set; }
+	}
 }
