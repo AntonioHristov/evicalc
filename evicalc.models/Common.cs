@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 
 namespace evicalc.models
 {
@@ -12,7 +11,7 @@ namespace evicalc.models
 
 		public static string getStringManyTimes(string text="", int times=1 )
 		{
-			string result = "";
+			var result = "";
 			for(int count = 0; count<times; count++)
 			{
 				result += text;
@@ -34,7 +33,7 @@ namespace evicalc.models
 
 		public static int getLenghtIEnumerable(IEnumerable ienumerable)
 		{
-			int count = 0;
+			var count = 0;
 			foreach (var item in ienumerable)
 			{
 				count++;
