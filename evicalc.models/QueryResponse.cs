@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace evicalc.models
@@ -13,12 +14,9 @@ namespace evicalc.models
 		public const string OPERATOR_RESULT = "=";
 		public const int ID_ALL_IDS = -1;
 		public const int FIRST_ID = Common.FIRST_POSITION_ARRAY; // 0
-		private static List<Record> _operations = new List<Record>() { };
+		private static readonly IList<Record> _operations = new List<Record>() { };
 
-		public static int GetLastId()
-		{
-			return Common.GetLastPositionList(GetListAllDataOperations());
-		}
+		public static int GetLastId() => _operations.Count - 1;
 
 		public static IList<int> GetListAllIdsOperations(bool idAllIdsIncluded = false)
 		{
@@ -32,19 +30,13 @@ namespace evicalc.models
 			return result;
 		}
 
-		// If I return an interface here, the method GetLastId doesn't work and I don't know why
-		public static List<Record> GetListAllDataOperations()
-		{
-			return _operations;
-		}
-
 		public static IList<Record> GetListDataOperationById(int idQuery)
 		{
 			if (idQuery >= FIRST_ID && idQuery <= GetLastId())
-				return new List<Record>() { GetListAllDataOperations()[idQuery] };
+				return new List<Record>() { _operations[idQuery] };
 			else
 			if (idQuery == ID_ALL_IDS)
-				return GetListAllDataOperations();
+				return _operations;
 
 			return null;
 		}
@@ -52,7 +44,8 @@ namespace evicalc.models
 		public static void AddDataOperation(string constOperation, IEnumerable<double> listNumbers, double resultOperation)
 		{
 			var calculation = Common.STRING_EMPTY; // ""
-			var countForEach = Common.FIRST_POSITION_ARRAY; // 0
+			var index = Common.FIRST_POSITION_ARRAY; // 0
+			var numbersLength = listNumbers.Count()-1;
 
 			foreach (double number in listNumbers)
 			{
@@ -62,7 +55,7 @@ namespace evicalc.models
 				calculation += number + Common.BLANK_SPACE;
 
 				// If its the last time in foreach loop
-				if (countForEach == Common.GetLastPositionIEnumerable(listNumbers))
+				if (index == numbersLength)
 				{
 					calculation += OPERATOR_RESULT + Common.BLANK_SPACE + resultOperation;
 
@@ -73,10 +66,11 @@ namespace evicalc.models
 				{
 					calculation += constOperation + Common.BLANK_SPACE;
 				}
-				countForEach++;
+
+				index++;
 			}
-			var newOperation = new Record() { Operation = constOperation, Calculation = calculation, Date = System.DateTime.Now};
-			GetListAllDataOperations().Add(newOperation);
+
+			_operations.Add(new Record() { Operation = constOperation, Calculation = calculation, Date = DateTime.UtcNow });
 		}
 	}
 }

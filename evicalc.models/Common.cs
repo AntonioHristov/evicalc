@@ -18,27 +18,5 @@ namespace evicalc.models
 			}
 			return result;
 		}
-
-		public static int GetLastPositionList(IList list)
-		{
-			return list.Count - 1;
-		}
-
-		// Although I use "using System.Linq;", "ienumerable.Count();" doesn't work
-		public static int GetLenghtIEnumerable(IEnumerable ienumerable)
-		{
-			var count = 0;
-			foreach (var item in ienumerable)
-			{
-				count++;
-			}
-			return count;
-		}
-
-		public static int GetLastPositionIEnumerable(IEnumerable ienumerable)
-		{
-			return GetLenghtIEnumerable(ienumerable)-1;
-		}
-
 	}
 }

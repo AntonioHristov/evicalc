@@ -21,7 +21,7 @@ namespace evicalc.server.Controllers
 			const double DIGITSNULL = 0;
 			const double MINIMUMDIGITS = 2;
 			var numbers = request.Addens;
-			var numberDigits = Common.GetLenghtIEnumerable(numbers);
+			var length = numbers.Count();
 			/*
 			* Variations that I think...
 			*
@@ -33,9 +33,9 @@ namespace evicalc.server.Controllers
 			* Decimals with many "," and/or "." (Maybe an error or parse to string and take only the first one an remove the other ones, and then parse to double again)
 			*/
 
-			if (numberDigits == DIGITSNULL)
+			if (length == DIGITSNULL)
 				return BadRequest("Addens cannot be null");
-			else if (numberDigits < MINIMUMDIGITS)
+			else if (length < MINIMUMDIGITS)
 				return BadRequest("Addens param requires at least two numbers to do something");
 			/*
 			// Another exception before these if, I think it should be in client instead here
