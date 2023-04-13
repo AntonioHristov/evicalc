@@ -1,7 +1,3 @@
 .vs
-evicalc.models/bin
-evicalc.models/obj
-evicalc.client/bin
-evicalc.client/obj
-evicalc.server/bin
-evicalc.server/obj
+/*/bin/
+/*/obj/
