@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace evicalc.models
 {
 	public class AddRequest
 	{
-		public IEnumerable<double> Addens { get; set; }
+		public IList<double> Addens { get; set; }
 	}
 }

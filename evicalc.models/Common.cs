@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 
 namespace evicalc.models
 {
@@ -17,6 +18,24 @@ namespace evicalc.models
 				result += text;
 			}
 			return result;
+		}
+
+		public static bool StringIsDouble(string valueString)
+		{
+			double variableDouble;
+			return Double.TryParse(valueString, out variableDouble);
+		}
+
+		public static bool ArrayContainsChar(char caracter, params char[] arrayChar)
+		{
+			foreach (var item in arrayChar)
+			{
+				if (item == caracter)
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 	}
 }

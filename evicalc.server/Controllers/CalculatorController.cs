@@ -1,6 +1,5 @@
 ﻿using evicalc.models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace evicalc.server.Controllers
 {
@@ -110,12 +109,12 @@ namespace evicalc.server.Controllers
 
 			if (result == null)
 			{
-				var error = $"No existe la ID {request.Id}. Las id existentes son: {Environment.NewLine} Todas las Ids: {QueryResponse.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine, QueryResponse.GetListAllIdsOperations())}";
+				var error = $"The ID {request.Id} doesn't exist. The allowed Ids are: {Environment.NewLine} All Ids: {QueryResponse.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine + Common.BLANK_SPACE, QueryResponse.GetListAllIdsOperations())}";
 				return BadRequest(error);
 			}
 			else if (result.Count == Common.LENGHT_LIST_EMPTY)
 			{
-				var error = "Está vacío porque no has hecho ninguna operación aún...";
+				var error = "It's empty because you haven't created any operations yet";
 				return BadRequest(error);
 			}
 			return Ok(result);
