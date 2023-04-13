@@ -1,5 +1,6 @@
 ﻿using evicalc.models;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace evicalc.server.Controllers
 {
@@ -20,7 +21,7 @@ namespace evicalc.server.Controllers
 			const double DIGITSNULL = 0;
 			const double MINIMUMDIGITS = 2;
 			var numbers = request.Addens;
-			var numberDigits = Common.getLenghtIEnumerable(numbers);
+			var numberDigits = Common.GetLenghtIEnumerable(numbers);
 			/*
 			* Variations that I think...
 			*
@@ -42,7 +43,7 @@ namespace evicalc.server.Controllers
 				return BadRequest("Addens must be a number, not a text");
 			*/
 			var resultOperation = numbers.Sum();
-			QueryResponse.addDataOperation(QueryResponse.OPERATOR_ADD, numbers, resultOperation);
+			QueryResponse.AddDataOperation(QueryResponse.OPERATOR_ADD, numbers, resultOperation);
 			return Ok(new AddResponse() { Sum = resultOperation });
 		}
 
@@ -52,7 +53,7 @@ namespace evicalc.server.Controllers
 			var numbers = new List<double>() { request.Minuend, request.Subtrahend };
 			var resultOperation = request.Minuend - request.Subtrahend;
 
-			QueryResponse.addDataOperation(QueryResponse.OPERATOR_SUB, numbers, resultOperation);
+			QueryResponse.AddDataOperation(QueryResponse.OPERATOR_SUB, numbers, resultOperation);
 			return Ok(new SubResponse() { Difference = resultOperation });
 		}
 
@@ -74,7 +75,7 @@ namespace evicalc.server.Controllers
 			{
 				result *= item;
 			}
-			QueryResponse.addDataOperation(QueryResponse.OPERATOR_MUL, numbers, result);
+			QueryResponse.AddDataOperation(QueryResponse.OPERATOR_MUL, numbers, result);
 			return Ok(new MultResponse() { Product = result });
 		}
 
@@ -88,7 +89,7 @@ namespace evicalc.server.Controllers
 
 			var numbers = new List<double>() { request.Dividend, request.Divisor };
 			var result = request.Dividend / request.Divisor;
-			QueryResponse.addDataOperation(QueryResponse.OPERATOR_DIV, numbers, result);
+			QueryResponse.AddDataOperation(QueryResponse.OPERATOR_DIV, numbers, result);
 			return Ok(new DivResponse() { Quotient = result, Remainder = request.Dividend % request.Divisor });
 		}
 
@@ -98,21 +99,21 @@ namespace evicalc.server.Controllers
 			var numbers = new List<double>() { request.Number };
 			var result = Math.Sqrt(numbers.First());
 
-			QueryResponse.addDataOperation(QueryResponse.OPERATOR_SQR, numbers, result);
+			QueryResponse.AddDataOperation(QueryResponse.OPERATOR_SQR, numbers, result);
 			return Ok(new SqrtResponse() { Square = Math.Sqrt(request.Number) });
 		}
 
 		[HttpPost]
 		public IActionResult Query(QueryRequest request)
 		{
-			var result = QueryResponse.getListDataOperationById(request.Id);
+			var result = QueryResponse.GetListDataOperationById(request.Id);
 
 			if (result == null)
 			{
-				var error = $"No existe la ID {request.Id}. Las id existentes son: {Environment.NewLine} Todas las Ids: {QueryResponse.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine, QueryResponse.getListAllIdsOperations())}";
+				var error = $"No existe la ID {request.Id}. Las id existentes son: {Environment.NewLine} Todas las Ids: {QueryResponse.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine, QueryResponse.GetListAllIdsOperations())}";
 				return BadRequest(error);
 			}
-			else if (Common.getLenghtList(result) == Common.LENGHT_LIST_EMPTY)
+			else if (result.Count == Common.LENGHT_LIST_EMPTY)
 			{
 				var error = "Está vacío porque no has hecho ninguna operación aún...";
 				return BadRequest(error);

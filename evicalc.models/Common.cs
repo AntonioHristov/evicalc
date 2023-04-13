@@ -9,7 +9,7 @@ namespace evicalc.models
 		public const int FIRST_POSITION_ARRAY = 0;
 		public const int LENGHT_LIST_EMPTY = 0;
 
-		public static string getStringManyTimes(string text="", int times=1 )
+		public static string GetStringManyTimes(string text="", int times=1 )
 		{
 			var result = "";
 			for(int count = 0; count<times; count++)
@@ -19,19 +19,13 @@ namespace evicalc.models
 			return result;
 		}
 
-		public static int getLenghtList(IList list)
+		public static int GetLastPositionList(IList list)
 		{
-			return list.Count;
+			return list.Count - 1;
 		}
 
-		public static int getLastPositionList(IList list)
-		{
-			return getLenghtList(list) - 1;
-		}
-
-
-
-		public static int getLenghtIEnumerable(IEnumerable ienumerable)
+		// Although I use "using System.Linq;", "ienumerable.Count();" doesn't work
+		public static int GetLenghtIEnumerable(IEnumerable ienumerable)
 		{
 			var count = 0;
 			foreach (var item in ienumerable)
@@ -41,9 +35,9 @@ namespace evicalc.models
 			return count;
 		}
 
-		public static int getLastPositionIEnumerable(IEnumerable ienumerable)
+		public static int GetLastPositionIEnumerable(IEnumerable ienumerable)
 		{
-			return getLenghtIEnumerable(ienumerable)-1;
+			return GetLenghtIEnumerable(ienumerable)-1;
 		}
 
 	}

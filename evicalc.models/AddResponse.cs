@@ -2,6 +2,6 @@
 {
 	public class AddResponse
 	{
-		public double Sum {  get; set; }
+		public double Sum { get; set; }
 	}
 }
