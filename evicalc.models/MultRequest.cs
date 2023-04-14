@@ -4,6 +4,6 @@ namespace evicalc.models
 {
 	public class MultRequest
 	{
-		public IEnumerable<double> Factors { get; set; }
+		public IList<double> Factors { get; set; }
 	}
 }

@@ -22,8 +22,12 @@ namespace evicalc.models
 
 		public static bool StringIsDouble(string valueString)
 		{
-			double variableDouble;
-			return Double.TryParse(valueString, out variableDouble);
+			return double.TryParse(valueString, out double doubleValue);
+		}
+
+		public static bool StringIsDouble(string valueString, out double result)
+		{
+			return double.TryParse(valueString, out result);
 		}
 
 		public static bool ArrayContainsChar(char caracter, params char[] arrayChar)
