@@ -7,6 +7,6 @@ namespace evicalc.models
 		public int Id { get; set; }
 		public char Operation { get; set; }
 		public string Calculation { get; set; }
-		public DateTime Date { get; set; }
+		public DateTime Date { get; set; } = DateTime.Now;
 	}
 }

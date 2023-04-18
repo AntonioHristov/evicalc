@@ -46,7 +46,7 @@ namespace evicalc.client
 			}
 			operationsAvailable += $"'{_operatorUser._operatorJournal}' = Journal{Environment.NewLine}";
 			operationsAvailable += $"'{CODE_EXIT}' = Exit" ;
-			return ReadValuesType.ReadChar($"Tell me the operation you want to do {Environment.NewLine}{Environment.NewLine}Operations available: {Environment.NewLine}{operationsAvailable}");
+			return ReadValuesType.ReadChar($"Your ID is: {Journal.GetCurrentID()}{Common.GetStringManyTimes(Environment.NewLine, 2)}Tell me the operation you want to do {Common.GetStringManyTimes(Environment.NewLine,2)}Operations available: {Environment.NewLine}{operationsAvailable}");
 		}
 
 		public static void DoOperation()
@@ -60,7 +60,7 @@ namespace evicalc.client
 
 				switch (operatorResponse)
 				{
-					case var user when user == _operatorUser._operatorAdd: // Because this fix the error "a constant value is expected" when I compare with a variable value and it works
+					case var user when user == _operatorUser._operatorAdd: // Case and when is because this fix the error "a constant value is expected" when I compare with a variable value and it works
 					case var math when math == _operatorMath._operatorAdd:
 						DoAddOp();
 						break;
@@ -99,7 +99,7 @@ namespace evicalc.client
 
 		public static void DoAddOp()
 		{
-			var request = new AddRequest(){Addens = new List<double>()};
+			var request = new AddRequest();//{Addens = new List<double>()};
 
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorAdd}");
 
@@ -123,7 +123,7 @@ namespace evicalc.client
 
 		public static void DoSubOp()
 		{
-			var request = new SubRequest(){Minuend = 0D,Subtrahend = 0D};
+			var request = new SubRequest();//{Minuend = 0D,Subtrahend = 0D};
 
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorSub}");
 			request.Minuend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend");
@@ -136,7 +136,7 @@ namespace evicalc.client
 
 		public static void DoMulOp()
 		{
-			var request = new MultRequest(){Factors = new List<double>()};
+			var request = new MultRequest();//{Factors = new List<double>()};
 
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorMul}");
 
@@ -158,20 +158,17 @@ namespace evicalc.client
 
 		public static void DoDivOp()
 		{
-			var request = new DivRequest(){Dividend = 0D,Divisor = 0D};
+			var request = new DivRequest();//{Dividend = 0D,Divisor = 0D};
 
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorDiv}");
 			request.Dividend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend");
-			/*
+
 			do
 			{
 				request.Divisor = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend");
 				if(request.Divisor == 0)
-				{
 					Console.WriteLine($"{Environment.NewLine}Divisor can't be 0");
-				}
 			} while (request.Divisor == 0);
-			*/request.Divisor = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend");
 
 			var response = PostRequest.Post<DivRequest, DivResponse>(POST_URL + POST_DIV, request);
 			if (response != null)
@@ -180,7 +177,7 @@ namespace evicalc.client
 
 		public static void DoSqrOp()
 		{
-			var request = new SqrtRequest(){Number = 0D};
+			var request = new SqrtRequest();//{Number = 0D};
 
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorSqr}");
 			request.Number = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the number");
@@ -195,15 +192,13 @@ namespace evicalc.client
 			var request = new QueryRequest(); //{ Id = 0 };
 			var sb = new StringBuilder();
 
-
 			Console.WriteLine($"{Environment.NewLine}Operator: Journal");
-			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine + Common.BLANK_SPACE, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}");
-
+			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}");
 			var response = PostRequest.Post<QueryRequest, QueryResponse>(POST_URL + POST_QUERY, request);
 
 			if (response != null)
 				Console.WriteLine(Journal.ParseListRecordToString(response.Operations));
-			Console.WriteLine(Environment.NewLine + Environment.NewLine);
+			Console.WriteLine(Common.GetStringManyTimes(Environment.NewLine, 2));
 		}
 
 		public static void ReadFile()
@@ -211,6 +206,5 @@ namespace evicalc.client
 			IEnumerable<string> lines = File.ReadLines(FILE_SOURCE);
 			Console.WriteLine(String.Join(Environment.NewLine, lines));
 		}
-
 	}
 }

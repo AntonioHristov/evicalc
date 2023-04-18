@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace evicalc.client
 {
@@ -12,8 +13,14 @@ namespace evicalc.client
 			{
 				Console.WriteLine(strRequest);
 
-				if (double.TryParse(Console.ReadLine(), out var value))
-					return value;
+				var doubleInput = Console.ReadLine();
+				if (double.TryParse(doubleInput, out _))
+				{
+					if(doubleInput.Contains(","))
+						return double.Parse(doubleInput.Replace(',', '.'), CultureInfo.GetCultureInfo("en-US"));
+
+					return double.Parse(doubleInput, CultureInfo.GetCultureInfo("en-US"));
+				}
 
 				Console.WriteLine(strError);
 			}
@@ -21,12 +28,17 @@ namespace evicalc.client
 
 		public static double? TryReadDouble(string strRequest = "Add a valid double..")
 		{
-				Console.WriteLine(strRequest);
+			Console.WriteLine(strRequest);
 
-				if (double.TryParse(Console.ReadLine(), out var value))
-					return value;
+			var doubleInput = Console.ReadLine();
+			if (double.TryParse(doubleInput, out _))
+			{
+				if (doubleInput.Contains(","))
+					return double.Parse(doubleInput.Replace(',', '.'), CultureInfo.GetCultureInfo("en-US"));
 
-				return null;
+				return double.Parse(doubleInput, CultureInfo.GetCultureInfo("en-US"));
+			}
+			return null;
 		}
 
 		public static int ReadInt(string strRequest = "Add a valid int..", string strError = "\nThe value must be a number without decimals\n")

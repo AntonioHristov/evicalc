@@ -22,38 +22,46 @@ namespace evicalc.models
 		public const string DATE_RECORD_PREFIX = "Date: ";
 		public const string FINAL_DATA_OPERATION = "";
 		public static readonly DateTime? _dateNow = null;
-		public static List<Record> _operations = new List<Record>() { };
-		private static int _currentId = FIRST_ID; // If another user is connected after, will be not lastId
+		public static IList<Record> _operations = new List<Record>() { };
+		private static int _currentId = FIRST_ID; // If another user is connected after, it will be not lastId. Atleast this is the idea
 		private static int? _lastId = null;
 
-
-
-		public static List<int> GetListAllIdsOperations(bool idAllIdsIncluded = false, string fileSource = null)
-		{
-			var result = new List<int>();
-			if (idAllIdsIncluded)
-				result.Add(ID_ALL_IDS);
-
-			for (int id = FIRST_ID; id <= GetLastID(fileSource); id += RANGE_IDS)
-				result.Add(id);
-
-			return result;
-		}
-
-		public static List<Record> GetListDataOperationByIdList(int idQuery, string fileSource = null)
+		public static IList<int> GetListAllIdsOperations(bool idAllIdsIncluded = false, string fileSource = null)
 		{
 			if (fileSource != null)
 			{
+				Common.CheckFileExist(fileSource, true);
+				var result = new List<int>();
+				if (idAllIdsIncluded)
+					result.Add(ID_ALL_IDS);
+
+				for (int id = FIRST_ID; id <= GetLastID(fileSource); id += RANGE_IDS)
+					result.Add(id);
+
+				return result;
+			}
+			return null;
+		}
+
+		public static IList<Record> GetListDataOperationByIdList(int idQuery=ID_ALL_IDS, string fileSource = null)
+		{
+			if (fileSource != null)
+			{
+				Common.CheckFileExist(fileSource, true);
 				var lines = File.ReadLines(fileSource);
 				var result = new List<Record>();
 				var lastRecord = new Record();
+				var lastIdChecked = FIRST_ID;
 
 				if (idQuery == ID_ALL_IDS)
 				{
 					foreach (var line in lines)
 					{
 						if (line.Contains(ID_RECORD_PREFIX))
+						{
 							lastRecord.Id = int.Parse(line.Substring(CHAR_DATA_ID_FILE));
+							lastIdChecked = lastRecord.Id;
+						}
 						else if (line.Contains(OPERATION_RECORD_PREFIX))
 							lastRecord.Operation = line[CHAR_DATA_OPERATION_FILE];
 						else if (line.Contains(CALCULATION_RECORD_PREFIX))
@@ -62,48 +70,42 @@ namespace evicalc.models
 							lastRecord.Date = DateTime.Parse(line.Substring(CHAR_DATA_DATE_FILE));
 						else if (line == FINAL_DATA_OPERATION)
 						{
+							if (lastRecord.Id == FIRST_ID)
+								lastRecord.Id = lastIdChecked;
 							result.Add(lastRecord);
 							lastRecord = new Record();
 						}
-
 					}
 					return result;
 				}
-				else if (!lines.Contains(ID_RECORD_PREFIX+idQuery))
-				{
+				else if (!lines.Contains(ID_RECORD_PREFIX + idQuery))
 					return null;
-				}
 
-
-
-				var idData = false;
+				var dataFromId = false;
 				foreach (var line in lines)
 				{
 					if (line.Contains(ID_RECORD_PREFIX + idQuery))
-					{
-						idData = true;
-					}
-					if (line == ID_RECORD_PREFIX + (idQuery + RANGE_IDS))
-					{
-						idData = false;
-					}
+						dataFromId = true;
+					else if (line == ID_RECORD_PREFIX + (idQuery + RANGE_IDS))
+						dataFromId = false;
 
-					if (idData)
+					if (dataFromId)
 					{
 						if (line.Contains(ID_RECORD_PREFIX))
 						{
 							lastRecord.Id = int.Parse(line.Substring(CHAR_DATA_ID_FILE));
+							lastIdChecked = lastRecord.Id;
 						}
-						if (line.Contains(OPERATION_RECORD_PREFIX))
-						{
+						else if (line.Contains(OPERATION_RECORD_PREFIX))
 							lastRecord.Operation = line[CHAR_DATA_OPERATION_FILE];
-						}
-						if (line.Contains(CALCULATION_RECORD_PREFIX))
+						else if (line.Contains(CALCULATION_RECORD_PREFIX))
 							lastRecord.Calculation = line.Substring(CHAR_DATA_CALCULATION_FILE);
-						if (line.Contains(DATE_RECORD_PREFIX))
+						else if (line.Contains(DATE_RECORD_PREFIX))
 							lastRecord.Date = DateTime.Parse(line.Substring(CHAR_DATA_DATE_FILE));
-						if (line == FINAL_DATA_OPERATION)
+						else if (line == FINAL_DATA_OPERATION)
 						{
+							if (lastRecord.Id == FIRST_ID)
+								lastRecord.Id = lastIdChecked;
 							result.Add(lastRecord);
 							lastRecord = new Record();
 						}
@@ -112,54 +114,37 @@ namespace evicalc.models
 				return result;
 			}
 			return null;
-			/*
-			if (idQuery >= FIRST_ID && idQuery <= GetLastId())
-				return new List<Record>() { _operations[idQuery] };
-			else
-			if (idQuery == ID_ALL_IDS)
-				return _operations;
-
-			return null;
-			*/
 		}
 
 		public static string GetListDataOperationByIdString(int idQuery = ID_ALL_IDS, string fileSource = null)
 		{
 			if (fileSource != null)
 			{
+				Common.CheckFileExist(fileSource, true);
 				var lines = File.ReadLines(fileSource);
 
 				if (idQuery == ID_ALL_IDS)
-				{
 					return String.Join(Environment.NewLine, lines); // return all log content separate by lines
-				}
 				else if (!lines.Contains(ID_RECORD_PREFIX + idQuery))
 					return null;
 
-
 				var result = "";
-				var idData = false;
+				var dataFromId = false;
 				foreach (var line in lines)
 				{
 					if (line.Contains(ID_RECORD_PREFIX + idQuery))
-					{
-						idData = true;
-					}
-					if (line.Contains(ID_RECORD_PREFIX + (idQuery + RANGE_IDS)))
-					{
-						idData = false;
-					}
-					if (idData)
-					{
+						dataFromId = true;
+					else if (line.Contains(ID_RECORD_PREFIX + (idQuery + RANGE_IDS)))
+						dataFromId = false;
+					if (dataFromId)
 						result += Environment.NewLine + line;
-					}
 				}
 				return result;
 			}
 			return null;
 		}
 
-		public static string ParseListRecordToString(List<Record> list)
+		public static string ParseListRecordToString(IList<Record> list)
 		{
 			if (list != null)
 			{
@@ -178,18 +163,23 @@ namespace evicalc.models
 
 		public static void AddDataOperation(char operation=' ', string calculation="", DateTime? date = null, string fileSource = null)
 		{
-			if (date == null)
-				date = DateTime.UtcNow;
+			if (fileSource != null)
+			{
+				Common.CheckFileExist(fileSource, true);
+				if (date == null)
+					date = DateTime.UtcNow;
 
-			_operations.Add(new Record() { Id = _currentId, Operation = operation, Calculation = calculation, Date = date.Value });
-			if(fileSource != null)
-				CreateLog(operation,calculation,date, fileSource);
+				_operations.Add(new Record() { Id = _currentId, Operation = operation, Calculation = calculation, Date = date.Value });
+				if (fileSource != null)
+					CreateLog(operation, calculation, date, fileSource);
+			}
 		}
 
 		public static void CreateLog(char operation = ' ', string calculation = "", DateTime? date = null, string fileSource = null)
 		{
 			if (fileSource != null)
 			{
+				Common.CheckFileExist(fileSource, true);
 				var sb = new StringBuilder();
 				sb.AppendLine(OPERATION_RECORD_PREFIX + operation.ToString());
 				sb.AppendLine(CALCULATION_RECORD_PREFIX + calculation.ToString());
@@ -204,20 +194,17 @@ namespace evicalc.models
 		{
 			if (fileSource != null)
 			{
+				Common.CheckFileExist(fileSource, true);
 				if (_lastId != null)
 					return _lastId.Value;
 				var lines = File.ReadLines(fileSource);
 				if (!lines.Contains(ID_RECORD_PREFIX + FIRST_ID))
-				{
 					return null;
-				}
 
 				foreach (var line in lines)
 				{
 					if (line.Contains(ID_RECORD_PREFIX))
-					{
 						_lastId = int.Parse(line.Substring(CHAR_DATA_ID_FILE));
-					}
 				}
 				return _lastId.Value;
 			}
@@ -228,6 +215,7 @@ namespace evicalc.models
 		{
 			if (fileSource != null)
 			{
+				Common.CheckFileExist(fileSource, true);
 				var sb = new StringBuilder();
 				if (GetLastID(fileSource) == null)
 				{
@@ -247,7 +235,10 @@ namespace evicalc.models
 			}
 		}
 
-
-			// FIXME: Move it and may refactor (to api).
+		public static int GetCurrentID()
+		{
+			var resultInValue = _currentId; // The Idea is not allow to modify outside, but get the value and modify the value in this class only
+			return resultInValue;
+		}
 	}
 }

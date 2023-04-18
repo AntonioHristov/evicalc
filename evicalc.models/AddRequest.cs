@@ -5,6 +5,6 @@ namespace evicalc.models
 {
 	public class AddRequest
 	{
-		public IList<double> Addens { get; set; }
+		public IList<double> Addens { get; set; } = new List<double>();
 	}
 }

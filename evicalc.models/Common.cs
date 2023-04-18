@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
 
 namespace evicalc.models
 {
@@ -40,6 +41,18 @@ namespace evicalc.models
 				}
 			}
 			return false;
+		}
+
+		public static bool CheckFileExist(string source = "", bool createIfNot = false)
+		{
+			if (!File.Exists(source))
+			{ // Create a file to write to
+				if (createIfNot)
+					File.Create(source).Close();
+				else
+					return false;
+			}
+			return true;
 		}
 	}
 }

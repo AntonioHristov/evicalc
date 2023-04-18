@@ -24,16 +24,6 @@ namespace evicalc.server.Controllers
 			_logger = logger;
 		}
 
-/*
-* Variations that I think...
-*
-* Empty
-* 1 Number (Maybe an error or the second number could be 0 in add)
-* Words and simbols (Error)
-* Code Injection (Error)
-* Decimals with "," or "."  (I think "," is good but "." is ignored, so try to parse to string, change the "." for "," and parse to double again)
-* Decimals with many "," and/or "." (Maybe an error or parse to string and take only the first one an remove the other ones, and then parse to double again)
-*/
 		[HttpPost]
 		public IActionResult Add(AddRequest request)
 		{
@@ -134,7 +124,7 @@ namespace evicalc.server.Controllers
 
 			if (resultList == null)
 			{
-				var error = $"The ID {request.Id} doesn't exist. The allowed Ids are: {Environment.NewLine} All Ids: {Journal.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine + Common.BLANK_SPACE, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}";
+				var error = $"The ID {request.Id} doesn't exist. The allowed Ids are: {Environment.NewLine}All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}";
 				return BadRequest(error);
 			}
 			else if (resultList.Count == Common.FIRST_POSITION_ARRAY)
@@ -143,7 +133,7 @@ namespace evicalc.server.Controllers
 				return BadRequest(error);
 			}
 
-			var result = new QueryResponse() { Operations = resultList };
+			var result = new QueryResponse() { Operations = (List<Record>)resultList };
 			return Ok(result);
 		}
 	}
