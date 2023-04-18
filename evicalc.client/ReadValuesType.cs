@@ -6,7 +6,7 @@ namespace evicalc.client
 {
 	public class ReadValuesType
 	{
-		public static double ReadDouble(string strRequest= "Add a valid double..", string strError= "The value must be a number\n")
+		public static double ReadDouble(string strRequest= "Add a valid double..", string strError= "\nThe value must be a number\n")
 		{
 			while (true)
 			{
@@ -29,7 +29,30 @@ namespace evicalc.client
 				return null;
 		}
 
-		public static bool ReadBoolean(string strRequest = "Do you want to exit?", string strError = "opps, it's not a valid value\n", string strYes = "y", string strNo="n", bool addResponsesToStrRequest = true)
+		public static int ReadInt(string strRequest = "Add a valid int..", string strError = "\nThe value must be a number without decimals\n")
+		{
+			while (true)
+			{
+				Console.WriteLine(strRequest);
+
+				if (int.TryParse(Console.ReadLine(), out var value))
+					return value;
+
+				Console.WriteLine(strError);
+			}
+		}
+
+		public static int? TryReadInt(string strRequest = "Add a valid int..")
+		{
+			Console.WriteLine(strRequest);
+
+			if (int.TryParse(Console.ReadLine(), out var value))
+				return value;
+
+			return null;
+		}
+
+		public static bool ReadBoolean(string strRequest = "Do you want to exit?", string strError = "\nopps, it's not a valid value\n", string strYes = "y", string strNo="n", bool addResponsesToStrRequest = true)
 		{
 			if(addResponsesToStrRequest)
 			{
@@ -47,7 +70,7 @@ namespace evicalc.client
 			}
 		}
 
-		public static char ReadChar(string strRequest = "Add a valid char..", string strError = "The value must be a char\n", List<char> posibleValues = null)
+		public static char ReadChar(string strRequest = "Add a valid char..", string strError = "\nThe value must be a char\n", List<char> posibleValues = null)
 		{
 			while (true)
 			{

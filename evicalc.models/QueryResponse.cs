@@ -4,6 +4,6 @@ namespace evicalc.models
 {
 	public class QueryResponse
 	{
-		public IEnumerable<Record> Operations { get; set; }
+		public List<Record> Operations { get; set; }
 	}
 }

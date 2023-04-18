@@ -6,12 +6,30 @@ using evicalc.models;
 using System.Net;
 using System.Linq.Expressions;
 using System.Linq;
+using EasyHttp.Infrastructure;
+using System.Text;
+using System.IO;
 
 namespace evicalc.client
 {
 	public class Program
 	{
+		//"http://localhost:5217/Calculator/Add"
+		private const string POST_PROTOCOL = "http";
+		private const string POST_IP = "localhost";
+		private const string POST_PORT = "5217";
+		private const string POST_CONTROLLER = "Calculator";
+		private const string POST_ADD = "Add";
+		private const string POST_SUB = "Sub";
+		private const string POST_MULT = "Mult";
+		private const string POST_DIV = "Div";
+		private const string POST_SQRT = "Sqrt";
+		private const string POST_QUERY = "Query";
+		private const string POST_URL = POST_PROTOCOL+"://"+POST_IP+":"+POST_PORT+"/"+POST_CONTROLLER+"/";
+		private const string FILE_SOURCE = "./../../../log.txt";
 		const char CODE_EXIT = 'e';
+		private static OperatorMath _operatorMath = new OperatorMath();
+		private static OperatorUser _operatorUser = new OperatorUser();
 
 		public static void Main(string[] args)
 		{
@@ -22,51 +40,54 @@ namespace evicalc.client
 		{
 			var operationsAvailable = "";
 
-			for(var index=0; index<Operation.GetChars().Count; index++)
+			for (var index = 0; index < _operatorMath.GetOperators().Count; index++)
 			{
-				operationsAvailable += $"'{Operation.GetChars().ToArray()[index]}' =  {Operation.GetOperators().ToArray()[index]}{Environment.NewLine}";
+				operationsAvailable += $"'{_operatorUser.GetOperators().ToArray()[index]}' =  {_operatorMath.GetOperators().ToArray()[index]}{Environment.NewLine}";
 			}
+			operationsAvailable += $"'{_operatorUser._operatorJournal}' = Journal{Environment.NewLine}";
 			operationsAvailable += $"'{CODE_EXIT}' = Exit" ;
-
 			return ReadValuesType.ReadChar($"Tell me the operation you want to do {Environment.NewLine}{Environment.NewLine}Operations available: {Environment.NewLine}{operationsAvailable}");
-			//Console.WriteLine($"Tell me the operation you want to do {Environment.NewLine}{Environment.NewLine}Operations available: {Environment.NewLine}'{string.Join("'"+Environment.NewLine+"'", Operation.GetOperators())}'{Environment.NewLine}'{Operation.OPERATOR_RESULT}' = Exit");
-			//return Console.ReadLine();
 		}
 
 		public static void DoOperation()
 		{
-			bool exit = false;
+			var exit = false;
+			Journal.LogNewId(FILE_SOURCE);
+
 			while (!exit)
 			{
 				var operatorResponse = OperatorRequest();
 
 				switch (operatorResponse)
 				{
-					case Operation.CHAR_ADD:
-					case Operation.OPERATOR_ADD:
+					case var user when user == _operatorUser._operatorAdd: // Because this fix the error "a constant value is expected" when I compare with a variable value and it works
+					case var math when math == _operatorMath._operatorAdd:
 						DoAddOp();
 						break;
-					case Operation.CHAR_SUB:
-					case Operation.OPERATOR_SUB:
+					case var user when user == _operatorUser._operatorSub:
+					case var math when math == _operatorMath._operatorSub:
 						DoSubOp();
 						break;
-					case Operation.CHAR_MUL:
-					case Operation.OPERATOR_MUL:
+					case var user when user == _operatorUser._operatorMul:
+					case var math when math == _operatorMath._operatorMul:
 						DoMulOp();
 						break;
-					case Operation.CHAR_DIV:
-					case Operation.OPERATOR_DIV:
+					case var user when user == _operatorUser._operatorDiv:
+					case var math when math == _operatorMath._operatorDiv:
 						DoDivOp();
 						break;
-					case Operation.CHAR_SQR:
-					case Operation.OPERATOR_SQR:
+					case var user when user == _operatorUser._operatorSqr:
+					case var math when math == _operatorMath._operatorSqr:
 						DoSqrOp();
+						break;
+					case var user when user == _operatorUser._operatorJournal:
+						DoJournalOp();
 						break;
 					case CODE_EXIT:
 						exit = true;
 						break;
 					default:
-						Console.WriteLine("Value not valid");
+						Console.WriteLine($"{Environment.NewLine}Value not valid{Environment.NewLine}");
 						break;
 				}
 			}
@@ -78,106 +99,136 @@ namespace evicalc.client
 
 		public static void DoAddOp()
 		{
-			var request = new AddRequest()
-			{
-				Addens = new List<double>()
-			};
+			var request = new AddRequest(){Addens = new List<double>()};
 
-			Console.WriteLine($"Operator: {Operation.OPERATOR_ADD} {Environment.NewLine}");
+			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorAdd}");
 
-			request.Addens.Add(ReadValuesType.ReadDouble("Give me the first number"));
-			request.Addens.Add(ReadValuesType.ReadDouble("Give me the second number"));
+			request.Addens.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the first number"));
+			request.Addens.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the second number"));
 
 			while (true)
 			{
-				var obj = ReadValuesType.TryReadDouble("Do you want to add another number? Anything not a number.. skip");
+				var obj = ReadValuesType.TryReadDouble($"{Environment.NewLine}Do you want to add another number? Anything not a number.. skip");
 				if (obj == null) break;
 				request.Addens.Add(obj.Value);
 			}
 
 			// FIXME: Instead, we should log it.
-			Console.WriteLine($"User input was: {string.Join(", ", request.Addens)}");
+			Console.WriteLine($"{Environment.NewLine}User input was: {string.Join(", ", request.Addens)}");
 
-			var response = PostRequest.Post<AddRequest, AddResponse>("http://localhost:5217/Calculator/Add", request);
-			Console.WriteLine("The result is: " + response.Sum + Environment.NewLine);
+			var response = PostRequest.Post<AddRequest, AddResponse>(POST_URL+POST_ADD, request);
+			if (response != null)
+				Console.WriteLine($"{Environment.NewLine}The result is: {response.Sum}{Environment.NewLine}");
 		}
 
 		public static void DoSubOp()
 		{
-			var request = new SubRequest()
-			{
-				Minuend = 0D,
-				Subtrahend = 0D
-			};
+			var request = new SubRequest(){Minuend = 0D,Subtrahend = 0D};
 
-			Console.WriteLine($"Operator: {Operation.OPERATOR_SUB} {Environment.NewLine}");
-			request.Minuend = ReadValuesType.ReadDouble("Give me the minuend");
-			request.Subtrahend = ReadValuesType.ReadDouble("Give me the Subtrahend");
+			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorSub}");
+			request.Minuend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend");
+			request.Subtrahend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend");
 
-			var response = PostRequest.Post<SubRequest, SubResponse>("http://localhost:5217/Calculator/Sub", request);
-			Console.WriteLine("The result is: " + response.Difference + Environment.NewLine);
+			var response = PostRequest.Post<SubRequest, SubResponse>(POST_URL + POST_SUB, request);
+			if (response != null)
+				Console.WriteLine($"{Environment.NewLine}The result is: {response.Difference}{Environment.NewLine}");
 		}
 
 		public static void DoMulOp()
 		{
-			var request = new MultRequest()
-			{
-				Factors = new List<double>()
-			};
+			var request = new MultRequest(){Factors = new List<double>()};
 
-			Console.WriteLine($"Operator: {Operation.OPERATOR_MUL} {Environment.NewLine}");
+			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorMul}");
 
-			request.Factors.Add(ReadValuesType.ReadDouble("Give me the first number"));
-			request.Factors.Add(ReadValuesType.ReadDouble("Give me the second number"));
+			request.Factors.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the first number"));
+			request.Factors.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the second number"));
 
 			while (true)
 			{
-				var obj = ReadValuesType.TryReadDouble("Do you want to add another number? Anything not a number.. skip");
+				var obj = ReadValuesType.TryReadDouble($"{Environment.NewLine}Do you want to add another number? Anything not a number.. skip");
 				if (obj == null) break;
 				request.Factors.Add(obj.Value);
 			}
 
 
-			var response = PostRequest.Post<MultRequest, MultResponse>("http://localhost:5217/Calculator/Mult", request);
-			Console.WriteLine("The result is: " + response.Product + Environment.NewLine);
+			var response = PostRequest.Post<MultRequest, MultResponse>(POST_URL + POST_MULT, request);
+			if (response != null)
+				Console.WriteLine($"{Environment.NewLine}The result is: {response.Product}{Environment.NewLine}");
 		}
 
 		public static void DoDivOp()
 		{
-			var request = new DivRequest()
-			{
-				Dividend = 0D,
-				Divisor = 0D
-			};
+			var request = new DivRequest(){Dividend = 0D,Divisor = 0D};
 
-			Console.WriteLine($"Operator: {Operation.OPERATOR_DIV} {Environment.NewLine}");
-			request.Dividend = ReadValuesType.ReadDouble("Give me the minuend");
+			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorDiv}");
+			request.Dividend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend");
+			/*
 			do
 			{
-				request.Divisor = ReadValuesType.ReadDouble("Give me the Subtrahend");
+				request.Divisor = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend");
 				if(request.Divisor == 0)
 				{
-					Console.WriteLine("Divisor can't be 0");
+					Console.WriteLine($"{Environment.NewLine}Divisor can't be 0");
 				}
 			} while (request.Divisor == 0);
+			*/request.Divisor = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend");
 
-
-			var response = PostRequest.Post<DivRequest, DivResponse>("http://localhost:5217/Calculator/Div", request);
-			Console.WriteLine("The result is: " + response.Quotient + " and the remainder is: " + response.Remainder + Environment.NewLine);
+			var response = PostRequest.Post<DivRequest, DivResponse>(POST_URL + POST_DIV, request);
+			if (response != null)
+				Console.WriteLine($"{Environment.NewLine}The result is: {response.Quotient} and the remainder is: {response.Remainder}{Environment.NewLine}");
 		}
 
 		public static void DoSqrOp()
 		{
-			var request = new SqrtRequest()
-			{
-				Number = 0D
-			};
+			var request = new SqrtRequest(){Number = 0D};
 
-			Console.WriteLine($"Operator: {Operation.OPERATOR_SQR} {Environment.NewLine}");
-			request.Number = ReadValuesType.ReadDouble("Give me the number");
+			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorSqr}");
+			request.Number = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the number");
 
-			var response = PostRequest.Post<SqrtRequest, SqrtResponse>("http://localhost:5217/Calculator/Sqrt", request);
-			Console.WriteLine("The result is: " + response.Square + Environment.NewLine);
+			var response = PostRequest.Post<SqrtRequest, SqrtResponse>(POST_URL + POST_SQRT, request);
+			if (response != null)
+				Console.WriteLine($"{Environment.NewLine}The result is: {response.Square}{Environment.NewLine}");
 		}
+
+		public static void DoJournalOp()
+		{
+			var request = new QueryRequest() { Id = 0 };
+			var sb = new StringBuilder();
+
+
+			Console.WriteLine($"{Environment.NewLine}Operator: Journal");
+			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine + Common.BLANK_SPACE, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}");
+
+			//var response = PostRequest.Post<QueryRequest, QueryResponse>(POST_URL + POST_QUERY, request);
+			//Journal.AddDataOperation(_operatorMath._operatorAdd, "1 + 2 = 3");
+			//Journal.AddDataOperation(_operatorMath._operatorAdd, "3 * 3 = 9");
+			var response = Journal.GetListDataOperationById(request.Id, FILE_SOURCE);
+
+			if (response != null)
+			{
+				/*
+				foreach (var item in response)
+				{
+					Console.WriteLine(item.Operation);
+					Console.WriteLine(item.Calculation);
+					Console.WriteLine(item.Date);
+				}
+				Console.WriteLine(response.Count);
+				*/
+				Console.WriteLine(response);
+			}
+			else
+			{
+				Console.WriteLine("Not response");
+			}
+			Console.WriteLine(Environment.NewLine + Environment.NewLine);
+		}
+
+		public static void ReadFile()
+		{
+			IEnumerable<string> lines = File.ReadLines(FILE_SOURCE);
+			Console.WriteLine(String.Join(Environment.NewLine, lines));
+		}
+
 	}
 }
