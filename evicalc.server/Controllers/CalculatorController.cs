@@ -2,6 +2,7 @@
 using evicalc.models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NLog.Web;
 
 namespace evicalc.server.Controllers
 {
@@ -13,7 +14,13 @@ namespace evicalc.server.Controllers
 
 		private const string REQUEST_CANNOT_BE_NULL = "Invalid request received, look like cannot be deserialized properly";
 		private static Operator _operatorMath = new OperatorMath();
-		private const string FILE_SOURCE = "./../log.txt";
+		private const string GENERAL_SOURCE = "./../";
+		private const string N_LOG_SOURCE = "./../../../../";
+		private const string JOURNAL_FILE = "journal.txt";
+		private const string LOG_FILE = "log.log";
+		private const string N_LOG_FILE = "nlog.config";
+		private const string JOURNAL_SOURCE = GENERAL_SOURCE+JOURNAL_FILE;
+		private const string LOG_SOURCE = GENERAL_SOURCE + LOG_FILE;
 
 		private readonly ILogger<CalculatorController> _logger;
 
@@ -27,6 +34,9 @@ namespace evicalc.server.Controllers
 		[HttpPost]
 		public IActionResult Add(AddRequest request)
 		{
+			var logger = NLogBuilder.ConfigureNLog(N_LOG_SOURCE + N_LOG_FILE).GetCurrentClassLogger();
+			logger.Debug("Hola Mundo Servidor");
+
 			const double MINIMUMDIGITS = 2;
 			if (request == null)
 				return BadRequest(REQUEST_CANNOT_BE_NULL);
@@ -39,7 +49,7 @@ namespace evicalc.server.Controllers
 
 			var result = Operation.Add(request.Addens); // request.Addens.Sum(); This case is simple but other cases like mult or div are not so simple like this
 			var calculation = $"{string.Join(" + ", request.Addens)} = {result}"; //< ie. "N + Y = X"
-			Journal.AddDataOperation(_operatorMath._operatorAdd, calculation, Journal._dateNow, FILE_SOURCE);
+			Journal.AddDataOperation(_operatorMath._operatorAdd, calculation, Journal._dateNow, JOURNAL_SOURCE);
 			return Ok(new AddResponse() { Sum = result });
 		}
 
@@ -56,7 +66,7 @@ namespace evicalc.server.Controllers
 			var numbers = new List<double>() { request.Minuend, request.Subtrahend };
 			var result = Operation.Sub(request.Minuend, request.Subtrahend);
 			var calculation = $"{string.Join(" - ", numbers)} = {result}";
-			Journal.AddDataOperation(_operatorMath._operatorSub, calculation, Journal._dateNow, FILE_SOURCE);
+			Journal.AddDataOperation(_operatorMath._operatorSub, calculation, Journal._dateNow, JOURNAL_SOURCE);
 			return Ok(new SubResponse() { Difference = result });
 		}
 
@@ -73,7 +83,7 @@ namespace evicalc.server.Controllers
 
 			var result = Operation.Mult(request.Factors);
 			var calculation = $"{string.Join(" * ", request.Factors)} = {result}";
-			Journal.AddDataOperation(_operatorMath._operatorMul, calculation, Journal._dateNow, FILE_SOURCE);
+			Journal.AddDataOperation(_operatorMath._operatorMul, calculation, Journal._dateNow, JOURNAL_SOURCE);
 			return Ok(new MultResponse() { Product = result });
 		}
 
@@ -94,7 +104,7 @@ namespace evicalc.server.Controllers
 			var resultQuotient = Operation.Div(request.Dividend, request.Divisor, Operation.DIV_QUOTIENT);
 			var resultRemainder = Operation.Div(request.Dividend, request.Divisor, Operation.DIV_REMAINDER);
 			var calculation = $"{string.Join(" / ", numbers)} = {resultQuotient} | {string.Join(" % ", numbers)} = {resultRemainder}";
-			Journal.AddDataOperation(_operatorMath._operatorDiv, calculation, Journal._dateNow, FILE_SOURCE);
+			Journal.AddDataOperation(_operatorMath._operatorDiv, calculation, Journal._dateNow, JOURNAL_SOURCE);
 			return Ok(new DivResponse() { Quotient = resultQuotient.Value, Remainder = resultRemainder.Value });
 		}
 
@@ -108,7 +118,7 @@ namespace evicalc.server.Controllers
 
 			var result = Operation.Sqrt(request.Number);
 			var calculation = $" {_operatorMath._operatorSqr}{request.Number} = {result}";
-			Journal.AddDataOperation(_operatorMath._operatorSqr, calculation, Journal._dateNow, FILE_SOURCE);
+			Journal.AddDataOperation(_operatorMath._operatorSqr, calculation, Journal._dateNow, JOURNAL_SOURCE);
 			return Ok(new SqrtResponse() { Square = Math.Sqrt(request.Number) });
 		}
 
@@ -120,11 +130,11 @@ namespace evicalc.server.Controllers
 			else if (request.Id.GetType() != typeof(int))
 				return BadRequest("Id must be a number, an int");
 
-			var resultList = Journal.GetListDataOperationByIdList(request.Id, FILE_SOURCE);
+			var resultList = Journal.GetListDataOperationByIdList(request.Id, JOURNAL_SOURCE);
 
 			if (resultList == null)
 			{
-				var error = $"The ID {request.Id} doesn't exist. The allowed Ids are: {Environment.NewLine}All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}";
+				var error = $"The ID {request.Id} doesn't exist. The allowed Ids are: {Environment.NewLine}All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, JOURNAL_SOURCE))}";
 				return BadRequest(error);
 			}
 			else if (resultList.Count == Common.FIRST_POSITION_ARRAY)

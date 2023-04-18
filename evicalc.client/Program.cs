@@ -9,6 +9,7 @@ using System.Linq;
 using EasyHttp.Infrastructure;
 using System.Text;
 using System.IO;
+using NLog.Web;
 
 namespace evicalc.client
 {
@@ -26,10 +27,16 @@ namespace evicalc.client
 		private const string POST_SQRT = "Sqrt";
 		private const string POST_QUERY = "Query";
 		private const string POST_URL = POST_PROTOCOL+"://"+POST_IP+":"+POST_PORT+"/"+POST_CONTROLLER+"/";
-		private const string FILE_SOURCE = "./../../../log.txt";
+		private const string GENERAL_SOURCE = "./../../../";
+		private const string JOURNAL_FILE = "journal.txt";
+		private const string LOG_FILE = "log.log";
+		private const string N_LOG_FILE = "nlog.config";
+		private const string JOURNAL_SOURCE = GENERAL_SOURCE + JOURNAL_FILE;
+		private const string LOG_SOURCE = GENERAL_SOURCE + LOG_FILE;
 		const char CODE_EXIT = 'e';
 		private static OperatorMath _operatorMath = new OperatorMath();
 		private static OperatorUser _operatorUser = new OperatorUser();
+
 
 		public static void Main(string[] args)
 		{
@@ -52,7 +59,10 @@ namespace evicalc.client
 		public static void DoOperation()
 		{
 			var exit = false;
-			Journal.LogNewId(FILE_SOURCE);
+			Journal.LogNewId(JOURNAL_SOURCE);
+			//var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+			var logger = NLogBuilder.ConfigureNLog(GENERAL_SOURCE + N_LOG_FILE).GetCurrentClassLogger();
+			logger.Debug("Hola Mundo Cliente");
 
 			while (!exit)
 			{
@@ -193,7 +203,7 @@ namespace evicalc.client
 			var sb = new StringBuilder();
 
 			Console.WriteLine($"{Environment.NewLine}Operator: Journal");
-			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}");
+			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, JOURNAL_SOURCE))}");
 			var response = PostRequest.Post<QueryRequest, QueryResponse>(POST_URL + POST_QUERY, request);
 
 			if (response != null)
@@ -203,7 +213,7 @@ namespace evicalc.client
 
 		public static void ReadFile()
 		{
-			IEnumerable<string> lines = File.ReadLines(FILE_SOURCE);
+			IEnumerable<string> lines = File.ReadLines(JOURNAL_SOURCE);
 			Console.WriteLine(String.Join(Environment.NewLine, lines));
 		}
 	}
