@@ -127,19 +127,23 @@ namespace evicalc.server.Controllers
 		{
 			if (request == null)
 				return BadRequest(REQUEST_CANNOT_BE_NULL);
+			else if (request.Id.GetType() != typeof(int))
+				return BadRequest("Id must be a number, an int");
 
-			var result = Journal.GetListDataOperationById(request.Id);
+			var resultList = Journal.GetListDataOperationByIdList(request.Id, FILE_SOURCE);
 
-			if (result == null)
+			if (resultList == null)
 			{
-				var error = $"The ID {request.Id} doesn't exist. The allowed Ids are: {Environment.NewLine} All Ids: {Journal.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine + Common.BLANK_SPACE, Journal.GetListAllIdsOperations())}";
+				var error = $"The ID {request.Id} doesn't exist. The allowed Ids are: {Environment.NewLine} All Ids: {Journal.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine + Common.BLANK_SPACE, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}";
 				return BadRequest(error);
 			}
-			else if (result == Common.STRING_EMPTY)
+			else if (resultList.Count == Common.FIRST_POSITION_ARRAY)
 			{
-				var error = "It's empty because you haven't created any operations yet";
+				var error = "It's empty, there's no operations";
 				return BadRequest(error);
 			}
+
+			var result = new QueryResponse() { Operations = resultList };
 			return Ok(result);
 		}
 	}

@@ -192,35 +192,17 @@ namespace evicalc.client
 
 		public static void DoJournalOp()
 		{
-			var request = new QueryRequest() { Id = 0 };
+			var request = new QueryRequest(); //{ Id = 0 };
 			var sb = new StringBuilder();
 
 
 			Console.WriteLine($"{Environment.NewLine}Operator: Journal");
 			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS} {Environment.NewLine} {string.Join(Environment.NewLine + Common.BLANK_SPACE, Journal.GetListAllIdsOperations(false, FILE_SOURCE))}");
 
-			//var response = PostRequest.Post<QueryRequest, QueryResponse>(POST_URL + POST_QUERY, request);
-			//Journal.AddDataOperation(_operatorMath._operatorAdd, "1 + 2 = 3");
-			//Journal.AddDataOperation(_operatorMath._operatorAdd, "3 * 3 = 9");
-			var response = Journal.GetListDataOperationById(request.Id, FILE_SOURCE);
+			var response = PostRequest.Post<QueryRequest, QueryResponse>(POST_URL + POST_QUERY, request);
 
 			if (response != null)
-			{
-				/*
-				foreach (var item in response)
-				{
-					Console.WriteLine(item.Operation);
-					Console.WriteLine(item.Calculation);
-					Console.WriteLine(item.Date);
-				}
-				Console.WriteLine(response.Count);
-				*/
-				Console.WriteLine(response);
-			}
-			else
-			{
-				Console.WriteLine("Not response");
-			}
+				Console.WriteLine(Journal.ParseListRecordToString(response.Operations));
 			Console.WriteLine(Environment.NewLine + Environment.NewLine);
 		}
 
