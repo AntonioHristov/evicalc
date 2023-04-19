@@ -42,25 +42,25 @@ namespace evicalc.server.Controllers
 				Common.LogStr("Error, the request is null", logger);
 				return BadRequest(REQUEST_CANNOT_BE_NULL);
 			}
-			else if (request.Addens?.Any() != true) //< Null or empty..
+			else if (request.Addends?.Any() != true) //< Null or empty..
 			{
 				Common.LogStr("Error, the content of request is null", logger);
-				return BadRequest("Addens cannot be null or empty");
+				return BadRequest("Addends cannot be null or empty");
 			}
-			else if (request.Addens.GetType() != typeof(List<double>))
+			else if (request.Addends.GetType() != typeof(List<double>))
 			{
 				Common.LogStr("Error, the content of request doesn't have the right type of value", logger);
-				return BadRequest("Addens must be a list of numbers");
+				return BadRequest("Addends must be a list of numbers");
 			}
-			else if (request.Addens.Count < MINIMUMDIGITS)
+			else if (request.Addends.Count < MINIMUMDIGITS)
 			{
 				Common.LogStr("Error, the content of request is not enough", logger);
-				return BadRequest("Addens param requires at least two numbers to do something");
+				return BadRequest("Addends param requires at least two numbers to do something");
 			}
 
 			Common.LogStr("Calculating", logger);
-			var result = Operation.Add(request.Addens); // request.Addens.Sum(); This case is simple but other cases like mult or div are not so simple like this
-			var calculation = $"{string.Join(" + ", request.Addens)} = {result}"; //< ie. "N + Y = X"
+			var result = Operation.Add(request.Addends, logger); // request.Addends.Sum(); This case is simple but other cases like mult or div are not so simple like this
+			var calculation = $"{string.Join(" + ", request.Addends)} = {result}"; //< ie. "N + Y = X"
 
 			Common.LogStr("Add the operation in Journal", logger);
 			Journal.AddDataOperation(_operatorMath._operatorAdd, calculation, Journal._dateNow, JOURNAL_SOURCE, logger);
@@ -94,7 +94,7 @@ namespace evicalc.server.Controllers
 			Common.LogStr("Calculating", logger);
 
 			var numbers = new List<double>() { request.Minuend, request.Subtrahend };
-			var result = Operation.Sub(request.Minuend, request.Subtrahend);
+			var result = Operation.Sub(request.Minuend, request.Subtrahend, logger);
 			var calculation = $"{string.Join(" - ", numbers)} = {result}";
 
 			Common.LogStr("Add the operation in Journal", logger);
@@ -133,7 +133,7 @@ namespace evicalc.server.Controllers
 			}
 
 			Common.LogStr("Calculating", logger);
-			var result = Operation.Mult(request.Factors);
+			var result = Operation.Mult(request.Factors, logger);
 			var calculation = $"{string.Join(" * ", request.Factors)} = {result}";
 
 			Common.LogStr("Add the operation in Journal", logger);
@@ -173,8 +173,8 @@ namespace evicalc.server.Controllers
 
 			Common.LogStr("Calculating", logger);
 			var numbers = new List<double>() { request.Dividend, request.Divisor };
-			var resultQuotient = Operation.Div(request.Dividend, request.Divisor, Operation.DIV_QUOTIENT);
-			var resultRemainder = Operation.Div(request.Dividend, request.Divisor, Operation.DIV_REMAINDER);
+			var resultQuotient = Operation.Div(request.Dividend, request.Divisor, Operation.DIV_QUOTIENT, logger);
+			var resultRemainder = Operation.Div(request.Dividend, request.Divisor, Operation.DIV_REMAINDER, logger);
 			var calculation = $"{string.Join(" / ", numbers)} = {resultQuotient} | {string.Join(" % ", numbers)} = {resultRemainder}";
 
 			Common.LogStr("Add the operation in Journal", logger);
@@ -202,7 +202,7 @@ namespace evicalc.server.Controllers
 			}
 
 			Common.LogStr("Calculating", logger);
-			var result = Operation.Sqrt(request.Number);
+			var result = Operation.Sqrt(request.Number, logger);
 			var calculation = $" {_operatorMath._operatorSqr}{request.Number} = {result}";
 
 			Common.LogStr("Add the operation in Journal", logger);

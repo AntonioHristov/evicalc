@@ -53,6 +53,16 @@ namespace evicalc.client
 			Console.WriteLine($"Hello user,{Environment.NewLine}This is Evicalc which is my calculator program, press enter and enjoy :3");
 		}
 
+		public static void SayGoodBye()
+		{
+			Common.PrintCurrentMethod(logger);
+			Common.LogStr("Clear the console, say Bye and close the program", logger);
+			Console.Clear();
+			Console.WriteLine("Bye");
+			Console.ReadLine();
+			Environment.Exit(0); // 0 is the code from exit success with no errors
+		}
+
 		public static void DoOperation()
 		{
 			Common.PrintCurrentMethod(logger);
@@ -105,11 +115,7 @@ namespace evicalc.client
 						break;
 				}
 			}
-			Common.LogStr("Clear the console, say Bye and close the program", logger);
-			Console.Clear();
-			Console.WriteLine("Bye");
-			Console.ReadLine();
-			Environment.Exit(0); // 0 is the code from exit success with no errors
+			SayGoodBye();
 		}
 
 		public static char OperatorRequest()
@@ -124,7 +130,7 @@ namespace evicalc.client
 			}
 			operationsAvailable += $"'{_operatorUser._operatorJournal}' = Journal{Environment.NewLine}";
 			operationsAvailable += $"'{CODE_EXIT}' = Exit";
-			return ReadValuesType.ReadChar($"Your ID is: {Journal.GetCurrentID(logger)}{Common.GetStringManyTimes(Environment.NewLine, 2, logger)}Tell me the operation you want to do {Common.GetStringManyTimes(Environment.NewLine, 2, logger)}Operations available: {Environment.NewLine}{operationsAvailable}");
+			return ReadValuesType.ReadChar($"Your ID is: {Journal.GetCurrentID(logger)}{Common.GetStringManyTimes(Environment.NewLine, 2, logger)}Tell me the operation you want to do {Common.GetStringManyTimes(Environment.NewLine, 2, logger)}Operations available: {Environment.NewLine}{operationsAvailable}","", null,logger);
 		}
 
 		public static void DoAddOp()
@@ -136,18 +142,18 @@ namespace evicalc.client
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorAdd}");
 
 			Common.LogStr("Prompt the numbers", logger);
-			request.Addens.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the first number"));
-			request.Addens.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the second number"));
+			request.Addends.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the first number","", logger));
+			request.Addends.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the second number","", logger));
 
 			while (true)
 			{
-				var obj = ReadValuesType.TryReadDouble($"{Environment.NewLine}Do you want to add another number? Anything not a number.. skip");
+				var obj = ReadValuesType.TryReadDouble($"{Environment.NewLine}Do you want to add another number? Anything not a number.. skip", logger);
 				if (obj == null) break;
-				request.Addens.Add(obj.Value);
+				request.Addends.Add(obj.Value);
 			}
-			Common.LogStr($"User input was: {string.Join(" | ", request.Addens)}", logger);
+			Common.LogStr($"User input was: {string.Join(" | ", request.Addends)}", logger);
 
-			var response = PostRequest.Post<AddRequest, AddResponse>(POST_URL+POST_ADD, request);
+			var response = PostRequest.Post<AddRequest, AddResponse>(POST_URL+POST_ADD, request, HttpContentTypes.ApplicationJson, logger);
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Sum);
@@ -166,12 +172,12 @@ namespace evicalc.client
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorSub}");
 
 			Common.LogStr("Prompt the numbers", logger);
-			request.Minuend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend");
-			request.Subtrahend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend");
+			request.Minuend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend", "", logger);
+			request.Subtrahend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend", "", logger);
 
 			Common.LogStr($"User input was: Minuend: {request.Minuend} | Subtrahend: {request.Subtrahend}", logger);
 
-			var response = PostRequest.Post<SubRequest, SubResponse>(POST_URL + POST_SUB, request);
+			var response = PostRequest.Post<SubRequest, SubResponse>(POST_URL + POST_SUB, request, HttpContentTypes.ApplicationJson, logger);
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Difference);
@@ -190,18 +196,18 @@ namespace evicalc.client
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorMul}");
 
 			Common.LogStr("Prompt the numbers", logger);
-			request.Factors.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the first number"));
-			request.Factors.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the second number"));
+			request.Factors.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the first number", "", logger));
+			request.Factors.Add(ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the second number", "", logger));
 
 			while (true)
 			{
-				var obj = ReadValuesType.TryReadDouble($"{Environment.NewLine}Do you want to add another number? Anything not a number.. skip");
+				var obj = ReadValuesType.TryReadDouble($"{Environment.NewLine}Do you want to add another number? Anything not a number.. skip", logger);
 				if (obj == null) break;
 				request.Factors.Add(obj.Value);
 			}
 			Common.LogStr($"User input was: {string.Join(" | ", request.Factors)}", logger);
 
-			var response = PostRequest.Post<MultRequest, MultResponse>(POST_URL + POST_MULT, request);
+			var response = PostRequest.Post<MultRequest, MultResponse>(POST_URL + POST_MULT, request, HttpContentTypes.ApplicationJson, logger);
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Product);
@@ -220,11 +226,11 @@ namespace evicalc.client
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorDiv}");
 
 			Common.LogStr("Prompt the numbers", logger);
-			request.Dividend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend");
+			request.Dividend = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the minuend", "", logger);
 
 			do
 			{
-				request.Divisor = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend");
+				request.Divisor = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the Subtrahend", "", logger);
 				if(request.Divisor == 0)
 				{
 					Common.LogStr("The user give a 0 in the divisor, so I prompt the divisor again...", logger);
@@ -234,7 +240,7 @@ namespace evicalc.client
 
 			Common.LogStr($"User input was: Dividend: {request.Dividend} | Divisor: {request.Divisor}", logger);
 
-			var response = PostRequest.Post<DivRequest, DivResponse>(POST_URL + POST_DIV, request);
+			var response = PostRequest.Post<DivRequest, DivResponse>(POST_URL + POST_DIV, request, HttpContentTypes.ApplicationJson, logger);
 			if (response != null && logger != null)
 			{
 				logger.Debug("The quotient is: {0} and the remainder is: {1}", response.Quotient, response.Remainder);
@@ -253,9 +259,9 @@ namespace evicalc.client
 			Console.WriteLine($"{Environment.NewLine}Operator: {_operatorMath._operatorSqr}");
 
 			Common.LogStr("Prompt the number", logger);
-			request.Number = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the number");
+			request.Number = ReadValuesType.ReadDouble($"{Environment.NewLine}Give me the number", "", logger);
 
-			var response = PostRequest.Post<SqrtRequest, SqrtResponse>(POST_URL + POST_SQRT, request);
+			var response = PostRequest.Post<SqrtRequest, SqrtResponse>(POST_URL + POST_SQRT, request, HttpContentTypes.ApplicationJson, logger);
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Square);
@@ -270,13 +276,12 @@ namespace evicalc.client
 			Common.PrintCurrentMethod(logger);
 			Common.LogStr("The user chose The Journal Operation", logger);
 			var request = new QueryRequest();
-			var sb = new StringBuilder();
 
 			Console.WriteLine($"{Environment.NewLine}Operator: Journal");
 
 			Common.LogStr("Prompt the Journal ID", logger);
-			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, JOURNAL_SOURCE, logger))}");
-			var response = PostRequest.Post<QueryRequest, QueryResponse>(POST_URL + POST_QUERY, request);
+			request.Id  = ReadValuesType.ReadInt($"{Environment.NewLine}Give me the ID, All Ids: {Journal.ID_ALL_IDS}{Environment.NewLine}{string.Join(Environment.NewLine, Journal.GetListAllIdsOperations(false, JOURNAL_SOURCE, logger))}", "", logger);
+			var response = PostRequest.Post<QueryRequest, QueryResponse>(POST_URL + POST_QUERY, request, HttpContentTypes.ApplicationJson, logger);
 
 			if (response != null && logger != null)
 			{
@@ -290,13 +295,6 @@ namespace evicalc.client
 				logger.Debug("2 New Lines");
 			Common.LogStr("2 New Lines", logger);
 			Console.WriteLine(Common.GetStringManyTimes(Environment.NewLine, 2, logger));
-		}
-
-		public static void ReadFile()
-		{
-			Common.PrintCurrentMethod(logger);
-			IEnumerable<string> lines = File.ReadLines(JOURNAL_SOURCE);
-			Console.WriteLine(String.Join(Environment.NewLine, lines));
 		}
 	}
 }

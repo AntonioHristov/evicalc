@@ -333,8 +333,5 @@ namespace evicalc.models
 			Common.LogStr($"Current ID is: {resultInValue}" + Environment.NewLine, logger);
 			return resultInValue;
 		}
-
-
-
 	}
 }
