@@ -1,6 +1,6 @@
 namespace evicalc.server
 {
-    public class Program
+    public class Index
     {
         public static void Main(string[] args)
         {
