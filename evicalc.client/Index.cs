@@ -157,7 +157,7 @@ namespace evicalc.client
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Sum);
-				Console.WriteLine("Saved operation");
+				Console.WriteLine($"Saved operation.{Environment.NewLine}Press enter to continue, please");
 			}
 			else if (logger != null)
 				logger.Debug("Error with the operation, response is null");
@@ -181,7 +181,7 @@ namespace evicalc.client
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Difference);
-				Console.WriteLine("Saved operation");
+				Console.WriteLine($"Saved operation.{Environment.NewLine}Press enter to continue, please");
 			}
 			else if (logger != null)
 				logger.Debug("Error with the operation, response is null");
@@ -211,7 +211,7 @@ namespace evicalc.client
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Product);
-				Console.WriteLine("Saved operation");
+				Console.WriteLine($"Saved operation.{Environment.NewLine}Press enter to continue, please");
 			}
 			else if (logger != null)
 				logger.Debug("Error with the operation, response is null");
@@ -244,7 +244,7 @@ namespace evicalc.client
 			if (response != null && logger != null)
 			{
 				logger.Debug("The quotient is: {0} and the remainder is: {1}", response.Quotient, response.Remainder);
-				Console.WriteLine("Saved operation");
+				Console.WriteLine($"Saved operation.{Environment.NewLine}Press enter to continue, please");
 			}
 			else if (logger != null)
 				logger.Debug("Error with the operation, response is null");
@@ -265,7 +265,7 @@ namespace evicalc.client
 			if (response != null && logger != null)
 			{
 				logger.Debug("The result is: {0}", response.Square);
-				Console.WriteLine("Saved operation");
+				Console.WriteLine($"Saved operation.{Environment.NewLine}Press enter to continue, please");
 			}
 			else if (logger != null)
 				logger.Debug("Error with the operation, response is null");
